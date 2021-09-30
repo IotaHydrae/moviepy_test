@@ -31,22 +31,15 @@ def blur(image):
 
 print("starting...", 3 * RES_HOR_MAX / 4)
 credits = credits1(creditfile="./credits.txt", width=480, gap=100,
-                   font="/usr/share/fonts/truetype/ubuntu/Ubuntu-R.ttf")
-#  font="微软雅黑")
-scrolling_credits = credits.set_pos(lambda t: ('center', -int((RES_VER_MAX / VIDEO_DURATION) * t)))
+                #    font="/usr/share/fonts/truetype/ubuntu/Ubuntu-R.ttf")
+ font="微软雅黑")
+scrolling_credits = credits.set_position(lambda t: ('center', -int((RES_VER_MAX / VIDEO_DURATION) * t)))
 
 final = CompositeVideoClip([scrolling_credits], size=(800, 480))
 final.duration = 5
-# final.fps=24
 
 final_blurred = final.fl_image(blur)
-final_blurred.preview(fps=24)
+# final_blurred.preview(fps=24)
 
-# final.preview(fps=24, audio=False)
-
-
-# final.write_videofile("../../test.avi", fps=24, codec='mpeg4')
-# cvc.write_videofile("../../test.avi", fps=25, codec="mpeg4")
-# final_clip = concatenate_videoclips(cvc)
-# final_clip.write_videofile("../../test.avi", fps=12, codec="mpeg4")
-# ipython_display(final)
+final.write_videofile("../../test.avi", fps=60, codec='mpeg4')
+# final_blurred.write_videofile("../../test.avi", fps=24, codec='mpeg4')
