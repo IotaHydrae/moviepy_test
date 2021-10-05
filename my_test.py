@@ -1,7 +1,9 @@
+# coding:utf-8
 from moviepy.editor import *
 
 from moviepy.video.tools.credits import credits1
-from skimage.filters import gaussian
+
+# from skimage.filters import gaussian
 
 RES_HOR_MAX = 1920
 RES_VER_MAX = 1080
@@ -26,19 +28,28 @@ VIDEO_DURATION = 5
 #     size=screensize)
 #
 # cvc.duration = 5
-def blur(image):
-    return gaussian(image.astype(float), sigma=1)
+
+# def blur(image):
+#     return gaussian(image.astype(float), sigma=1)
+
 
 print("starting...", 3 * RES_HOR_MAX / 4)
-credits = credits1(creditfile="./credits.txt", width=480, gap=100,
-                #    font="/usr/share/fonts/truetype/ubuntu/Ubuntu-R.ttf")
- font="微软雅黑")
-scrolling_credits = credits.set_position(lambda t: ('center', -int((RES_VER_MAX / VIDEO_DURATION) * t)))
+credits = credits1(creditfile="./credits.txt", width=1080, gap=100,
+                   #    font="/usr/share/fonts/truetype/ubuntu/Ubuntu-R.ttf")
+                   font="./msyh.ttc")
+scrolling_credits = credits.set_position(lambda t: ('center', -int((RES_VER_MAX / 4) * t)))
 
-final = CompositeVideoClip([scrolling_credits], size=(800, 480))
-final.duration = 5
+# Music
+audio_clips = AudioFileClip("./bgm.mp3")
+# scrolling_credits.set_audio(audio_clips.subclip(55, 65))
 
-final_blurred = final.fl_image(blur)
+scrolling_credits.audio = audio_clips.subclip(55,85)
+
+
+final = CompositeVideoClip([scrolling_credits], size=(1920, 1080))
+final.duration =30
+
+# final_blurred = final.fl_image(blur)
 # final_blurred.preview(fps=24)
 
 final.write_videofile("../../test.avi", fps=60, codec='mpeg4')
