@@ -47,10 +47,10 @@ scrolling_credits.audio = audio_clips.subclip(55,85)
 
 
 final = CompositeVideoClip([scrolling_credits], size=(1920, 1080))
-final.duration =30
+final.duration = 6
 
 # final_blurred = final.fl_image(blur)
 # final_blurred.preview(fps=24)
 
-final.write_videofile("../../test.avi", fps=60, codec='mpeg4')
+final.write_videofile("./test.avi", fps=60, codec='mpeg4')
 # final_blurred.write_videofile("../../test.avi", fps=24, codec='mpeg4')
