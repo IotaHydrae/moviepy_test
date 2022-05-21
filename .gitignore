@@ -113,3 +113,9 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+# custom
+*.avi
+*.mp4
+*.mp3
+*.wav
