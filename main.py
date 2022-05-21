@@ -5,7 +5,7 @@ from moviepy.video.tools.segmenting import findObjects
 # WE CREATE THE TEXT THAT IS GOING TO MOVE, WE CENTER IT.
 
 screensize = (720, 460)
-txtClip = TextClip('Syber OS', color='white', font='/usr/share/fonts/chinese/TrueType/msyh.ttf',
+txtClip = TextClip('HamsterBear', color='white', font='/usr/share/fonts/chinese/TrueType/msyh.ttf',
                    kerning=5, fontsize=100)
 print(type(txtClip))
 cvc = CompositeVideoClip([txtClip.set_pos('center')],
@@ -67,4 +67,4 @@ clips = [CompositeVideoClip(moveLetters(letters, funcpos),
 # final_clip = clips_array([clips[0], clips[1]],
 #                          [clips[2], clips[3]])
 final_clip = concatenate_videoclips(clips)
-final_clip.write_videofile('../../coolTextEffects.avi', fps=25, codec='mpeg4')
+final_clip.write_videofile('./coolTextEffects.avi', fps=25, codec='mpeg4')
