@@ -14,7 +14,7 @@ def main():
 
     final_clip = clips_array([[clip1, clip2]])
 
-    final_clip.resize(width=1080).write_videofile("./test.mp4", fps=24)
+    final_clip.resize(width=1080).write_videofile("./final.mp4", fps=24)
     pass
 
 if __name__ == "__main__":
