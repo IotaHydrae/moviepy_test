@@ -5,8 +5,8 @@ from moviepy.video.tools.segmenting import findObjects
 # WE CREATE THE TEXT THAT IS GOING TO MOVE, WE CENTER IT.
 
 screensize = (720, 460)
-txtClip = TextClip('HamsterBear', color='white', font='/usr/share/fonts/chinese/TrueType/msyh.ttf',
-                   kerning=5, fontsize=100)
+txtClip = TextClip('摘下无敌了啊', color='white', font='.\msyh.ttc',
+                   kerning=5, fontsize=72)
 print(type(txtClip))
 cvc = CompositeVideoClip([txtClip.set_pos('center')],
                          size=screensize)

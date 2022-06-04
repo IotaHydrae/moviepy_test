@@ -5,8 +5,8 @@ from moviepy.video.tools.credits import credits1
 
 # from skimage.filters import gaussian
 
-RES_HOR_MAX = 1920
-RES_VER_MAX = 1080
+RES_HOR_MAX = 2560
+RES_VER_MAX = 1440
 VIDEO_DURATION = 5
 
 # txtClip = TextClip('txtClip', color='white', font='/usr/share/fonts/chinese/TrueType/msyh.ttf',
@@ -33,20 +33,20 @@ VIDEO_DURATION = 5
 #     return gaussian(image.astype(float), sigma=1)
 
 
-print("starting...", 3 * RES_HOR_MAX / 4)
-credits = credits1(creditfile="./credits.txt", width=1080, gap=100,
+print("starting...")
+credits = credits1(creditfile="./credits.txt", width=1440, gap=100,
                    #    font="/usr/share/fonts/truetype/ubuntu/Ubuntu-R.ttf")
-                   font="./msyh.ttc")
+                   font=".\msyh.ttc")
 scrolling_credits = credits.set_position(lambda t: ('center', -int((RES_VER_MAX / 4) * t)))
 
 # Music
 audio_clips = AudioFileClip("./bgm.mp3")
 # scrolling_credits.set_audio(audio_clips.subclip(55, 65))
 
-scrolling_credits.audio = audio_clips.subclip(55,85)
+scrolling_credits.audio = audio_clips.subclip(55,61)
 
 
-final = CompositeVideoClip([scrolling_credits], size=(1920, 1080))
+final = CompositeVideoClip([scrolling_credits], size=(2560, 1440))
 final.duration = 6
 
 # final_blurred = final.fl_image(blur)
