@@ -1,48 +1,24 @@
-# Copyright (c) 2022 IotaHydrae
+# Copyright (c) 2023 iotah
 # 
 # This software is released under the MIT License.
 # https://opensource.org/licenses/MIT
 
 import os
 import sys
+import argparse
 from moviepy.editor import *
 from libs import _credits_opr
 
-ASSETS_TITBITS_DIR="./assets/titbits"
-ASSETS_IMAGES_DIR="./assets/images"
-ASSETS_SOUNDS_DIR="./assets/sounds"
+DEFAULT_X_RES = 1920
+DEFAULT_Y_RES = 1080
+DEFAULT_FRAMERATE = 60
 
-def gen_titbit() -> None:
-    titbit_resources = []
-    titbit_clips = []
-    screensize=(1920,1080)
+DEFAULT_DURATION = 19
+DEFAULT_OUTPUT_NAME = "./output.mp4"
+DEFAULT_OUTPUT_CODEC = "mpeg4"
 
-    # 获取所有的titbit资源
-    if os.path.exists(ASSETS_TITBITS_DIR) and len(os.listdir(ASSETS_TITBITS_DIR)) > 0:
-        resources = os.listdir(ASSETS_TITBITS_DIR)
-        for resource in resources:
-            if resource.endswith(".mp4") or resource.endswith(".avi"):
-                titbit_resources.append(resource)
-    
-    print(titbit_resources)
-
-    # 从资源中生成video clip
-    titbit_clips = [VideoFileClip(os.path.join(ASSETS_TITBITS_DIR, resource)).subclip(0,6) for resource in titbit_resources]
-
-    # 花絮字幕
-    txt_title = (TextClip("花絮", fontsize=60,
-                color='white', font="./fonts/msyh.ttc")
-                .margin(top=15, opacity=0)
-                .set_position(('center', 'top')))
-    title = (CompositeVideoClip([txt_title])
-            .fadein(.5)
-            .set_duration(3.5))
-
-    final_clip = concatenate_videoclips([title,titbit_clips])
-
-    final_clip.write_videofile("./final.mp4", fps=30)
-
-    pass
+def if_not_none(v, d):
+    return v if v is not None else d
 
 def gen_cast(path, duration):
     cdopr = _credits_opr.credits_opr(creditfile=path, height=1920, width=1080, gap=100, font="./fonts/msyh.ttc")
@@ -50,21 +26,49 @@ def gen_cast(path, duration):
     return scrolling_credits
 
 def main():
-    duration = 19
-    cast = gen_cast("./credits.txt", duration)
+    filename = "./credits.txt"
 
-    final = CompositeVideoClip([cast], size=(1920, 1080))
+    parser = argparse.ArgumentParser(
+        prog='python3 main.py',
+        description='used to generate a credits for movie',
+        epilog='Text at the bottom of help',
+    )
+
+    parser.add_argument('credits')
+    parser.add_argument('-d', '--duration')
+    parser.add_argument('-o', '--output')
+    parser.add_argument('-r', '--framerate')
+    parser.add_argument('-x', '--xres')
+    parser.add_argument('-y', '--yres')
+    parser.add_argument('-c', '--codec')
+
+
+    args = parser.parse_args()
+
+    print(args.credits, args.duration, args.output,
+          args.framerate, args.xres, args.yres, args.codec)
+
+    if os.path.exists(args.credits):
+        filename = args.credits
+    else:
+        exit("PATH ERROR! abort.")
+
+    duration  = if_not_none(args.duration, DEFAULT_DURATION)
+    framerate = if_not_none(args.framerate, DEFAULT_FRAMERATE)
+    xres = if_not_none(args.xres, DEFAULT_X_RES)
+    yres = if_not_none(args.yres, DEFAULT_Y_RES)
+    output = if_not_none(args.output, DEFAULT_OUTPUT_NAME)
+    codec = if_not_none(args.codec, DEFAULT_OUTPUT_CODEC)
+
+    print(duration, framerate, xres, yres, output, codec)
+
+    cast = gen_cast(filename, duration)
+    final = CompositeVideoClip([cast], size=(xres, yres))
     final.duration = duration
 
-    final.write_videofile("./final.mp4", fps=12, codec='mpeg4')
-    pass
-
-def debug():
-    # gen_titbit()
-    gen_cast()
+    final.write_videofile(output, fps=int(framerate), codec=codec)
     pass
 
 if __name__ == "__main__":
     main()
-    # debug()
     pass

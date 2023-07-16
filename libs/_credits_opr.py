@@ -100,13 +100,11 @@ class credits_opr:
                         font = "./fonts/NotoSansSC-Medium.otf",
                         fontsize=self.fontsize
                     )
-                # TODO: add image support
                 elif l.startswith(IMAGE_HEAD):
                     line = credit_line(
                         type = "image",
                         img_path=l.split(',')[1]
                     )
-                    pass
                 # TODO: add movie support
                 elif l.startswith(MOVIE_HEAD):
                     pass
