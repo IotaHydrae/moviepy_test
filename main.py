@@ -1,70 +1,70 @@
-import numpy as np
+# Copyright (c) 2022 IotaHydrae
+# 
+# This software is released under the MIT License.
+# https://opensource.org/licenses/MIT
+
+import os
+import sys
 from moviepy.editor import *
-from moviepy.video.tools.segmenting import findObjects
+from libs import _credits_opr
 
-# WE CREATE THE TEXT THAT IS GOING TO MOVE, WE CENTER IT.
+ASSETS_TITBITS_DIR="./assets/titbits"
+ASSETS_IMAGES_DIR="./assets/images"
+ASSETS_SOUNDS_DIR="./assets/sounds"
 
-screensize = (720, 460)
-txtClip = TextClip('摘下无敌了啊', color='white', font='.\msyh.ttc',
-                   kerning=5, fontsize=72)
-print(type(txtClip))
-cvc = CompositeVideoClip([txtClip.set_pos('center')],
-                         size=screensize)
+def gen_titbit() -> None:
+    titbit_resources = []
+    titbit_clips = []
+    screensize=(1920,1080)
 
-# THE NEXT FOUR FUNCTIONS DEFINE FOUR WAYS OF MOVING THE LETTERS
+    # 获取所有的titbit资源
+    if os.path.exists(ASSETS_TITBITS_DIR) and len(os.listdir(ASSETS_TITBITS_DIR)) > 0:
+        resources = os.listdir(ASSETS_TITBITS_DIR)
+        for resource in resources:
+            if resource.endswith(".mp4") or resource.endswith(".avi"):
+                titbit_resources.append(resource)
+    
+    print(titbit_resources)
 
+    # 从资源中生成video clip
+    titbit_clips = [VideoFileClip(os.path.join(ASSETS_TITBITS_DIR, resource)).subclip(0,6) for resource in titbit_resources]
 
-# helper function
-rotMatrix = lambda a: np.array([[np.cos(a), np.sin(a)],
-                                [-np.sin(a), np.cos(a)]])
+    # 花絮字幕
+    txt_title = (TextClip("花絮", fontsize=60,
+                color='white', font="./fonts/msyh.ttc")
+                .margin(top=15, opacity=0)
+                .set_position(('center', 'top')))
+    title = (CompositeVideoClip([txt_title])
+            .fadein(.5)
+            .set_duration(3.5))
 
+    final_clip = concatenate_videoclips([title,titbit_clips])
 
-def vortex(screenpos, i, nletters):
-    d = lambda t: 1.0 / (0.3 + t ** 8)  # damping
-    a = i * np.pi / nletters  # angle of the movement
-    v = rotMatrix(a).dot([-1, 0])
-    if i % 2: v[1] = -v[1]
-    return lambda t: screenpos + 400 * d(t) * rotMatrix(0.5 * d(t) * a).dot(v)
+    final_clip.write_videofile("./final.mp4", fps=30)
 
+    pass
 
-def cascade(screenpos, i, nletters):
-    v = np.array([0, -1])
-    d = lambda t: 1 if t < 0 else abs(np.sinc(t) / (1 + t ** 4))
-    return lambda t: screenpos + v * 400 * d(t - 0.15 * i)
+def gen_cast(path, duration):
+    cdopr = _credits_opr.credits_opr(creditfile=path, height=1920, width=1080, gap=100, font="./fonts/msyh.ttc")
+    scrolling_credits = cdopr.gen_credits().set_position(lambda t: ('center', -int((cdopr.h_sum / duration) * t)))
+    return scrolling_credits
 
+def main():
+    duration = 19
+    cast = gen_cast("./credits.txt", duration)
 
-def arrive(screenpos, i, nletters):
-    v = np.array([-1, 0])
-    d = lambda t: max(0, 3 - 3 * t)
-    return lambda t: screenpos - 400 * v * d(t - 0.2 * i)
+    final = CompositeVideoClip([cast], size=(1920, 1080))
+    final.duration = duration
 
+    final.write_videofile("./final.mp4", fps=12, codec='mpeg4')
+    pass
 
-def vortexout(screenpos, i, nletters):
-    d = lambda t: max(0, t)  # damping
-    a = i * np.pi / nletters  # angle of the movement
-    v = rotMatrix(a).dot([-1, 0])
-    if i % 2: v[1] = -v[1]
-    return lambda t: screenpos + 400 * d(t - 0.1 * i) * rotMatrix(-0.2 * d(t) * a).dot(v)
+def debug():
+    # gen_titbit()
+    gen_cast()
+    pass
 
-
-# WE USE THE PLUGIN findObjects TO LOCATE AND SEPARATE EACH LETTER
-
-letters = findObjects(cvc)  # a list of ImageClips
-
-
-# WE ANIMATE THE LETTERS
-
-def moveLetters(letters, funcpos):
-    return [letter.set_pos(funcpos(letter.screenpos, i, len(letters)))
-            for i, letter in enumerate(letters)]
-
-
-clips = [CompositeVideoClip(moveLetters(letters, funcpos),
-                            size=screensize).subclip(0, 5)
-         for funcpos in [vortex, cascade, arrive, vortexout]]
-
-# WE CONCATENATE EVERYTHING AND WRITE TO A FILE
-# final_clip = clips_array([clips[0], clips[1]],
-#                          [clips[2], clips[3]])
-final_clip = concatenate_videoclips(clips)
-final_clip.write_videofile('./coolTextEffects.avi', fps=25, codec='mpeg4')
+if __name__ == "__main__":
+    main()
+    # debug()
+    pass
